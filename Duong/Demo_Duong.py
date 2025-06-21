@@ -10,20 +10,17 @@ from datetime import datetime, timedelta
 import os
 import warnings
 
-# Suppress warnings
 warnings.filterwarnings("ignore")
 
-# Constants matching training configuration
-CONTEXT_LENGTH = 60  # Should match training
-PREDICTION_LENGTH = 1  # Single-step prediction
-MODEL_PATH = r"Model_Duong.pt"  # Đường dẫn chính xác đến file model
+CONTEXT_LENGTH = 60  
+PREDICTION_LENGTH = 1  
+MODEL_PATH = r"Model_Duong.pt"  
 
 def validate_model_structure(state_dict, config):
     """Kiểm tra tính tương thích của state_dict với cấu trúc model"""
     required_keys = {
         'head.projection.weight': (config.prediction_length, config.d_model),
         'head.projection.bias': (config.prediction_length,),
-        # Thêm các layer khác cần kiểm tra
     }
     
     missing_keys = []
@@ -44,7 +41,6 @@ def load_model():
         return None, None, None
     
     try:
-        # Configuration must match training exactly
         config = PatchTSTConfig(
             context_length=CONTEXT_LENGTH,
             prediction_length=PREDICTION_LENGTH,
@@ -57,10 +53,8 @@ def load_model():
             target_dim=1,
         )
         
-        # Load state dict first to validate
         state_dict = torch.load(MODEL_PATH, map_location='cpu')
         
-        # Validate model structure
         missing_keys, shape_mismatches = validate_model_structure(state_dict, config)
         
         if missing_keys or shape_mismatches:
@@ -74,7 +68,6 @@ def load_model():
             st.error(error_msg)
             return None, None, None
         
-        # Only proceed if validation passes
         model = PatchTSTForPrediction(config)
         model.load_state_dict(state_dict, strict=True)  # Sử dụng strict=True để đảm bảo khớp hoàn toàn
         
@@ -104,11 +97,9 @@ def predict_autoregressive(model, initial_context, prediction_steps, scaler, dev
     preds_array = np.array(preds).reshape(-1, 1)
     return scaler.inverse_transform(preds_array).flatten()
 
-# Streamlit UI
 st.set_page_config(page_title="Stock Price Predictor", layout="wide")
 st.title("📈 AI Stock Price Prediction (Strict Mode)")
 
-# Sidebar controls
 with st.sidebar:
     st.header("Parameters")
     ticker = st.text_input("Stock Ticker", "AAPL").upper()
@@ -118,9 +109,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown(f"Model Config: Context={CONTEXT_LENGTH} days, Prediction={PREDICTION_LENGTH} step")
 
-# Main content
 try:
-    # Get stock data
     df = yf.download(ticker, start=start_date, end=end_date, progress=False)
     
     if df.empty:
@@ -130,26 +119,21 @@ try:
     prices = df['Close'].values.astype(float)
     dates = df.index
     
-    # Load model with strict validation
     model, scaler, device = load_model()
     
     if model is None:
         st.error("Prediction aborted due to model incompatibility.")
         st.stop()
     
-    # Scale data
     scaler.fit(prices.reshape(-1, 1))
     scaled_prices = scaler.transform(prices.reshape(-1, 1)).flatten()
     context = scaled_prices[-CONTEXT_LENGTH:]
     
-    # Make predictions (autoregressive)
     preds = predict_autoregressive(model, context, prediction_days, scaler, device)
     
-    # Generate prediction dates
     last_date = dates[-1]
     pred_dates = [last_date + timedelta(days=i) for i in range(1, prediction_days+1)]
     
-    # Plot results
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.plot(dates[-CONTEXT_LENGTH:], prices[-CONTEXT_LENGTH:], label='Historical Prices', color='blue')
     ax.plot(pred_dates, preds, label='Predicted Prices', color='red', linestyle='--')
@@ -161,7 +145,6 @@ try:
     ax.grid(True)
     st.pyplot(fig)
     
-    # Show prediction table
     st.subheader("Prediction Details")
     pred_df = pd.DataFrame({
         "Date": pred_dates,
