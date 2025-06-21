@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore")
 # Constants matching training configuration
 CONTEXT_LENGTH = 60  # Should match training
 PREDICTION_LENGTH = 1  # Single-step prediction
-MODEL_PATH = r"./Model_Duong.pt"  # Đường dẫn chính xác đến file model
+MODEL_PATH = "Model_Duong.pt"  # Đường dẫn chính xác đến file model
 
 def validate_model_structure(state_dict, config):
     """Kiểm tra tính tương thích của state_dict với cấu trúc model"""
