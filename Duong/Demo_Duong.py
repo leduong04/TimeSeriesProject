@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore")
 
 CONTEXT_LENGTH = 60  
 PREDICTION_LENGTH = 1  
-MODEL_PATH = r"Model_Duong.pt"  
+MODEL_PATH = r"Duong\Model_Duong.pt"  
 
 def validate_model_structure(state_dict, config):
     """Kiểm tra tính tương thích của state_dict với cấu trúc model"""
