@@ -16,8 +16,8 @@ warnings.filterwarnings("ignore")
 # Constants matching training configuration
 CONTEXT_LENGTH = 60  # Should match training
 PREDICTION_LENGTH = 1  # Single-step prediction
-# MODEL_PATH = "Duong/Model_Duong.pt"  # Đường dẫn chính xác đến file model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "Model_Duong.pt")
+MODEL_PATH = "/mount/src/timeseriesproject/Duong/Model_Duong.pt"  # Đường dẫn chính xác đến file model
+# MODEL_PATH = os.path.join(os.path.dirname(__file__), "Model_Duong.pt")
 
 
 def validate_model_structure(state_dict, config):
