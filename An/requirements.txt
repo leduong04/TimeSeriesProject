@@ -4,8 +4,7 @@ pandas
 numpy
 matplotlib
 torch
-transformers
-scikit-learn
+tensorflow==2.15.0scikit-learn
 yfinance
 tensorflow
 keras
